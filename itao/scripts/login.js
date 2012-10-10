@@ -26,28 +26,35 @@ var tbLogin = (function(){
 
     //判断打开的登录tab是否登录成功
     function checkLoginSucceed(){
-        chrome.tabs.get(currentLoginTabId,function(tab){
-            if(typeof tab == 'undefined')
-            {
-                console.log('找不到指定的登录tab，当前登录状态将被重置');
-                currentLoginTabId = null;
-                return false;
-            }
 
-            if(!isTaoBaoLoginPage(tab.url))
-            {
-                return true;
+        var loginSucceed = false;
+            
+        chrome.cookies.getAll({domain:"taobao.com"}, function (cookies){
+            for(var i in cookies){
+                if (cookies[i].name=='_tb_token_'){
+                    if (cookies[i].value!='') 
+                    {
+                       loginSucceed = true;
+                       break;
+                    }
+                }
             }
-            else
-            {
-                //登录失败
+			
+			if(!loginSucceed){
+				//登录失败
                 console.log('登陆失败，关闭登录窗口，今天不再尝试登录');
                 localStorage['loginFailedDate'] = new Date().toDateString();
                 localStorage['promptLoginFailed'] = new Date().toDateString();
-                chrome.tabs.remove(currentLoginTabId);
+                //chrome.tabs.remove(currentLoginTabId);
                 currentLoginTabId = null;
-                return false;
-            }
+                return false; 
+			}
+			else
+			{
+				chrome.tabs.remove(currentLoginTabId);
+				currentLoginTabId = null;
+				return true;
+			}
         });
     }
 
@@ -108,7 +115,11 @@ chrome.extension.onConnect.addListener(function(port) {
         tbLogin.getInstance().port = port;
         if (msg.act == "formSubmitted"){
             console.log('login.js收到登录完毕请求');
-            setTimeout(tbLogin.getInstance().checkLoginSucceed(),2000);
+            setTimeout(tbLogin.getInstance().checkLoginSucceed,2000);
+        }
+        else if(msg.act == 'getUserForLogin')
+        {
+            port.postMessage({act: "startFillForm",user:localStorage['autoLoginUser'],pwd:localStorage['autoLoginPwd']});
         }
     });
   }
