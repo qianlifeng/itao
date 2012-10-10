@@ -1,4 +1,4 @@
-itao
+itao 爱淘
 ====
 
-a chrome extension to auto collecting today's taobao golden coin 
+自动领取淘金币的chrome扩展
