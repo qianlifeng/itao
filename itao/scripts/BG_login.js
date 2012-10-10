@@ -113,20 +113,3 @@ var tbLogin = (function(){
     }
 })();
 
-chrome.extension.onConnect.addListener(function(port) {
-  if(port.name == "tbLoginPort"){
-      //监听来自cs_login.js的消息
-      port.onMessage.addListener(function(msg) {
-        tbLogin.getInstance().port = port;
-        if (msg.act == "formSubmitted"){
-            console.log('login.js收到登录完毕请求');
-            setTimeout(tbLogin.getInstance().checkLoginSucceed,2000);
-        }
-        else if(msg.act == 'getUserForLogin')
-        {
-            port.postMessage({act: "startFillForm",user:localStorage['autoLoginUser'],pwd:localStorage['autoLoginPwd']});
-        }
-    });
-  }
-});
-

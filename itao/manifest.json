@@ -16,7 +16,8 @@
 	"css":["css/msgbox.css"],
     "matches":["http://*/*","https://*/*"],
     "run_at":"document_end",
-    "exclude_matches":["http://login.taobao.com/member/logout.jhtml*","https://login.taobao.com/member/login.jhtml?ref=itao*"]
+    "exclude_matches":["http://login.taobao.com/member/logout.jhtml*",
+					   "https://login.taobao.com/member/login.jhtml*"]
   },
   {
     "js":["scripts/CS_Login.js"],

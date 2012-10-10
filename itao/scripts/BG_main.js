@@ -219,31 +219,7 @@ function monitorLogin(id,sendResponse)
 	});
 }
 
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-    
-	console.log("bg.js ==> 得到 "+request.act+" 请求");
-	//收到content scripts的请求，询问是否需要显示消息框
-    //因为网页的dom只能由content scripts操纵
-    if (request.act == "getCoin"){
-		//如何打开的不是请求登录的tab则尝试获得淘金币
-		//如果这边不判断则可能不断循环请求登录tab
-		if(!isTaoBaoLoginPage(sender.tab.url))
-		{
-			getTaoBaoCoin(sendResponse);
-		}
-	}
-	else if(request.act == "tryLogin")
-	{
-        tbLogin.getInstance().login();
-	}
-	else if(request.act == "logout")
-	{
-		tbLogin.getInstance().logout();
-	}
-	
-	//因为使用了异步ajax，所以这里要返回true表明了要等待异步发送给sender
-	return true;
-});
+
 
 //初始化
 function init()
