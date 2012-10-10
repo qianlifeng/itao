@@ -234,8 +234,11 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 	else if(request.act == "tryLogin")
 	{
- 
         tbLogin.getInstance().login();
+	}
+	else if(request.act == "logout")
+	{
+		tbLogin.getInstance().logout();
 	}
 	
 	//因为使用了异步ajax，所以这里要返回true表明了要等待异步发送给sender
