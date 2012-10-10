@@ -2,7 +2,7 @@
   "name": "爱淘",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "",
+  "description": "自动领取淘金币",
   "browser_action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html"
@@ -15,13 +15,20 @@
     "js":["scripts/CS_getCoin.js"],
 	"css":["css/msgbox.css"],
     "matches":["http://*/*","https://*/*"],
-    "run_at":"document_end"
+    "run_at":"document_end",
+    "exclude_matches":["http://login.taobao.com/member/logout.jhtml*","https://login.taobao.com/member/login.jhtml?ref=itao*"]
   },
   {
     "js":["scripts/CS_Login.js"],
     "matches":["https://login.taobao.com/member/login.jhtml?ref=itao*"], 
     "run_at":"document_end"
+  },
+  {
+    "js":["scripts/CS_Logout.js"],
+    "matches":["http://login.taobao.com/member/logout.jhtml*"], 
+    "run_at":"document_end"
   }],
+  "options_page": "options.html",
   "permissions": [
 	"cookies", 
 	"tabs",
