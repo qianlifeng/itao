@@ -91,6 +91,11 @@ var tbLogin = (function(){
                     openTabForLogin();
                 }
             },
+			logout:function(){
+				chrome.browserAction.setBadgeText({ text: 'N/A' });
+				chrome.browserAction.setBadgeBackgroundColor({color:'#222'});
+				chrome.browserAction.setTitle({title:'还未登陆'});
+			},
             checkLoginSucceed:function(){
                 return checkLoginSucceed();                  
             },

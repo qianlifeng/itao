@@ -1,6 +1,1 @@
-alert('logout');
-
-
-chrome.extension.sendMessage({act: "logout"}, function(response) {
-	
-});
+chrome.extension.sendMessage({act: "logout"});
