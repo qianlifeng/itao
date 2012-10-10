@@ -1,0 +1,31 @@
+﻿{
+  "name": "爱淘",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description": "",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "background":{
+	"page":"bg.html"
+  },
+  "content_scripts":[
+  {
+    "js":["scripts/CS_getCoin.js"],
+	"css":["css/msgbox.css"],
+    "matches":["http://*/*","https://*/*"],
+    "run_at":"document_end"
+  },
+  {
+    "js":["scripts/CS_Login.js"],
+    "matches":["https://login.taobao.com/member/login.jhtml?ref=itao*"], 
+    "run_at":"document_end"
+  }],
+  "permissions": [
+	"cookies", 
+	"tabs",
+	"http://*/*",
+	"https://*/*"],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}
