@@ -29,6 +29,9 @@
     "matches":["http://login.taobao.com/member/logout.jhtml*"], 
     "run_at":"document_end"
   }],
+  "web_accessible_resources":[
+    "scripts/injected.js"
+  ],
   "options_page": "options.html",
   "permissions": [
 	"cookies", 

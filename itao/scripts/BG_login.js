@@ -1,10 +1,12 @@
 //单例模式
 var tbLogin = (function(){
-    var instance;
+
     //当前用于登录的tab id
-    var currentLoginTabId = null;
+    var currentLoginTabId = '';
     //用于和前台cs_login进行长链接通信的端口
     var port = null;
+	
+	var loginedInfoCache = {};
 
     //打开登录tab准备进行登录
     function openTabForLogin(){
@@ -14,8 +16,7 @@ var tbLogin = (function(){
     }
 
     //判断指定的url是否是登录页面
-    function isTaoBaoLoginPage(url)
-    {
+    function isTaoBaoLoginPage(url){
         if(url.indexOf('https://login.taobao.com') != 0 && url.indexOf('http://login.taobao.com') != 0)
         {
             return false;
@@ -23,50 +24,85 @@ var tbLogin = (function(){
         
         return true;
     }
-
+	
+	//是否已经登录到了淘宝
+	function hasAnyoneLogined(){
+		if(loginedInfoCache.token != '' && loginedInfoCache.tracknick != ''){
+			return true;
+		}
+		return false;
+	}
+	
+	//每隔一段时间自动获得登录信息。因为cookie相关的API
+	//都是异步的，与同步方法放在一起时候可能会获取不到值
+	function getLoginedInfoTimer(){
+		chrome.cookies.getAll({domain:"taobao.com"}, function (cookies){
+			for(var i in cookies){
+				if (cookies[i].name=='_nk_'){
+					if (cookies[i].value!='') 
+					{
+						loginedInfoCache.nk = js_JSONdecode(unescape(cookies[i].value));
+					}
+					else
+					{
+						loginedInfoCache.nk = '';
+					}
+				}
+				else if (cookies[i].name=='tracknick'){
+					if (cookies[i].value!='') 
+					{
+						loginedInfoCache.tracknick = js_JSONdecode(unescape(cookies[i].value));
+					}
+					else
+					{
+						loginedInfoCache.tracknick = '';
+					}
+				}
+				else if (cookies[i].name=='_tb_token_'){
+					if (cookies[i].value!='') 
+					{
+						loginedInfoCache.token=cookies[i].value;
+					}
+					else
+					{
+						loginedInfoCache.token = '';
+					}
+				}
+			}
+		});
+	}
+	
     //判断打开的登录tab是否登录成功
-    function checkLoginSucceed(){
-
-        var loginSucceed = false;
-            
-        chrome.cookies.getAll({domain:"taobao.com"}, function (cookies){
-            for(var i in cookies){
-                if (cookies[i].name=='_tb_token_'){
-                    if (cookies[i].value!='') 
-                    {
-                       loginSucceed = true;
-                       break;
-                    }
-                }
-            }
+    function handleLoginAfterSubmitted(){
+		console.log('开始判断是否登录成功');	
+		if(!hasAnyoneLogined()){
+			//登录失败
+            console.log('自动登陆失败');
+			showTipToContentScript('loginFailed',true);
+		}
+		else
+		{
+			console.log('自动登陆成功');
 			
-			if(!loginSucceed){
-				//登录失败
-                console.log('登陆失败，关闭登录窗口，今天不再尝试登录');
-                localStorage['loginFailedDate'] = new Date().toDateString();
-                localStorage['promptLoginFailed'] = new Date().toDateString();
-                //chrome.tabs.remove(currentLoginTabId);
-                currentLoginTabId = null;
-                return false; 
-			}
-			else
-			{
-				chrome.tabs.remove(currentLoginTabId);
-				currentLoginTabId = null;
-				return true;
-			}
-        });
+			//重置 hasCurrentUserGot，否则会一直认为已经获取
+			db.setHasCurrentUserGot('false');
+			
+			//一旦登录成功，肯定是保存用户登录成功
+		}
+		
+		chrome.tabs.remove(currentLoginTabId);
+		currentLoginTabId = '';
     }
 
     //是否正在登录
     function isProcessingLogin(){
-       if(currentLoginTabId == null) return false;
+       if(currentLoginTabId == '') return false;
 
        chrome.tabs.get(currentLoginTabId,function(tab){
             if(typeof tab == 'undefined')
             {
                 console.log('找不到指定的登录tab，当前登录状态将被重置');
-                currentLoginTabId = null;
+                currentLoginTabId = '';
                 return false;
             }
        });
@@ -74,42 +110,33 @@ var tbLogin = (function(){
        return true;
     }
 
-    function init(){
-        return {
-            //公开的方法和变量
-            login:function(){
-                //判断今天是否已经尝试登录，但是失败了。失败过一次后就不再尝试进行登录
-                var hasTryToLoginButFailedToday = localStorage['loginFailedDate'];
-                if(hasTryToLoginButFailedToday!='undefined' && hasTryToLoginButFailedToday == new Date().toDateString())
-                {
-                    console.log('今日已经尝试登录过，但是失败了。今日将不再尝试继续登录');
-                    return;
-                }
-
-                if(!isProcessingLogin()){
-                    //此操作会触发cs_login.js 的content脚本
-                    openTabForLogin();
-                }
-            },
-			logout:function(){
-				chrome.browserAction.setBadgeText({ text: 'N/A' });
-				chrome.browserAction.setBadgeBackgroundColor({color:'#222'});
-				chrome.browserAction.setTitle({title:'还未登陆'});
-			},
-            checkLoginSucceed:function(){
-                return checkLoginSucceed();                  
-            },
-            port:port
-        };
-    }
-
-    return{
-        getInstance:function(){
-            if(!instance){
-                instance = init();
+	
+    return {
+        login:function(){
+            if(!isProcessingLogin()){
+                //此操作会触发cs_login.js 的content脚本
+                openTabForLogin();
             }
-            return instance;
-        }
-    }
+        },
+		logout:function(){
+			chrome.browserAction.setBadgeText({ text: 'N/A' });
+			chrome.browserAction.setBadgeBackgroundColor({color:'#222'});
+			chrome.browserAction.setTitle({title:'还未登陆'});
+		},
+        handleLoginAfterSubmitted:function(){
+            return handleLoginAfterSubmitted();                  
+        },
+		hasAnyoneLogined:function(){
+			return hasAnyoneLogined();
+		},
+		getLoginedInfo:function(){
+			return loginedInfoCache;
+		},
+		startGetCookieInfoTimer:function(){
+			setInterval(getLoginedInfoTimer,1000);
+		},
+        port:port
+    };
 })();
 
+tbLogin.startGetCookieInfoTimer();

@@ -5,37 +5,6 @@ var intervalIdForMonitorLogin = -1;
 var grayColor = "#222";
 var redColor = "#F00";
 
-function $(id) { return document.getElementById(id); }
-
-function js_JSONencode(str){
-	return str.replace(/[^\u0000-\u00FF]/g,function($0){return escape($0).replace(/(%u)(\w{4})/gi,"\\u$2")});
-}
-
-function js_JSONdecode(str){
-	return unescape(str.replace(/\\u/g,"%u"));
-}
-
-function ajax(url,callback){
-	var xmlHttp;
-	xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function() {  
-        if (xmlHttp.readyState == 4) { 
-         	if (xmlHttp.status == 200){
-       			if (xmlHttp.responseText.trim().substr(0,1) == '{'){
-       				var result = eval('(' + xmlHttp.responseText + ')');  
-          			callback(result,xmlHttp.responseText);
-       			}
-                else{
-				    callback(xmlHttp.responseText,xmlHttp.responseText); 
-			    }
-       		}
-        }
-    };
-  
-    xmlHttp.open("GET", url, true);//第三个参数为true为异步方式  
-    xmlHttp.send(null);
-}
-
 //查看是否已经领取今天的淘金币
 function hasGetTodaysCoin(names){
 	var day=new Date().toDateString();
@@ -69,43 +38,6 @@ function doGetTodaysCoinToDB(name,newCoin)
 	localStorage['newCoin'] = newCoin;
 }
 
-
-//从淘宝的cookie中获得用户登录信息
-//所获得的信息放在tb变量中
-function getTaoBaoCookie()
-{
-	chrome.cookies.getAll({domain:"taobao.com"}, function (cookies){
-		tb.name='';
-		tb.token='';
-		var n1='';
-		var n2='';
-		for(var i in cookies){
-			if (cookies[i].name=='_nk_'){
-				if (cookies[i].value!='') 
-				{
-					n1=cookies[i].value;
-				}
-			}
-			//获得cookie中的当前登录的淘宝昵称
-			if (cookies[i].name=='tracknick'){
-				if (cookies[i].value!='') 
-				{
-					n2=cookies[i].value;
-				}
-			}
-			if (cookies[i].name=='_tb_token_'){
-				if (cookies[i].value!='') 
-				{
-					tb.token=cookies[i].value;
-				}
-			}
-		}
-		
-		tb.name=(n1=='')?js_JSONdecode(unescape(n2)):js_JSONdecode(unescape(n1));
-	});
-}
-
-
 //color:可以是css样式的颜色，例如：#eeeeee
 function setBadgeText(name,newCoin,colors)
 {
@@ -123,62 +55,76 @@ function setBadgeText(name,newCoin,colors)
 	chrome.browserAction.setBadgeBackgroundColor({color:colors});
 }
 
+//开始领取淘金币
+function doGetCoin(sendResponse){
+	
+	var info = tbLogin.getLoginedInfo();
+	
+    ajax('http://taojinbi.taobao.com/home/grant_everyday_coin.htm?_tb_token_='+info.token,function(json,text){
+
+        if (json.code=='1' || json.code == '2'){
+			//成功获得今日淘金币
+			db.setHasCurrentUserGot('true');
+			db.setCurrentUserCoin(json.newCoin);
+			db.setCurrentUserNick(info.tracknick);
+			db.setCurrentUserGotDate(new Date().toDateString());
+			
+			setBadgeText(info.tracknick,json.coinNew,redColor);
+			if(db.savedUserNick() == db.currentUserNick()){
+				//当前登录的用户是保存用户
+				db.setHasSavedUserGot('true');
+			}
+			
+			console.log('成功领取今日淘金币');
+			//发送给前台提示领取成功
+			if(json.code == '1') sendResponse({result:"true",data:json});
+        }
+		else if(json.code == '4')
+		{
+			setBadgeText(tb.name,'N/A',grayColor);
+			chrome.browserAction.setTitle({title: tb.name+ ' 还不能领取淘宝币，可能是好友不够'});
+		}
+		else if(!json.code)
+		{
+			console.log('json.code 为空，可能需要登录');
+		}
+    });
+}
+
 //获得淘金币
 function getTaoBaoCoin(sendResponse)
 {
-    getTaoBaoCookie();
-	
-	if(hasGetTodaysCoin(tb.name))
-	{
-		sendResponse({result:"false",reson:"今日已经领取过"});
-		return;
+	if(tbLogin.hasAnyoneLogined()){
+		if(db.hasCurrentUserGot() == 'false'){
+			doGetCoin(sendResponse);
+		}
+		else if(db.hasCurrentUserGot() == 'true' && db.currentUserGotDate() != new Date().toDateString())
+		{
+			//领过的同时，还需要判断是否是今天领取的
+			doGetCoin(sendResponse);
+		}
+		else{
+			console.log('今日已经领取过');
+		}
 	}
-	
-	// && !hasGetTodaysCoin(tb.name)
-    if (tb.name!='' && tb.token!='') 
-    {
-		//开始领取淘金币
-        ajax('http://taojinbi.taobao.com/home/grant_everyday_coin.htm?_tb_token_='+tb.token,function(json,text){
-			json["name"] = tb.name;
-			
-            if (json.code=='1'){
-
-				doGetTodaysCoinToDB(tb.name,json.newCoin);
-				setBadgeText(tb.name,json.coinNew,redColor);
-				
-				sendResponse({result:"true",data:json});
-            }
-            else if(json.code=='2'){
-				console.log("bg.js ==> 今日已经领取过");
-				doGetTodaysCoinToDB(tb.name,json.newCoin);
-				setBadgeText(tb.name,json.coinNew,redColor);
-				
-                sendResponse({result:"false",reson:"今日已经领取过",data:json});
-            }
-			else if(json.code == '4')
+	else{
+		if(db.savedUser() == ""){
+			console.log('当前没有用户登录，也没有检测到自动登录信息...');
+			return;
+		}
+		
+		//同样的判断领过的同时，还需要判断是否是今天领取的
+		if(db.hasSavedUserGot() == "false" || ( db.hasSavedUserGot() == 'true' && db.savedUserGotDate()!= new Date().toDateString() ))
+		{
+			if(db.dontTryLoginToday() !=  new Date().toDateString())
 			{
-				setBadgeText(tb.name,'N/A',grayColor);
-				chrome.browserAction.setTitle({title: tb.name+ ' 还不能领取淘宝币，可能是好友不够'});
-				sendResponse({result:"false",reson:"还不能领取淘宝币，可能是好友不够"});
+				tbLogin.login();
 			}
-			//不存在json.code说明需要登录
-			else if(!json.code)
-			{
-				sendResponse({result:"false",reson:"需要登录"});
-			}
-			
-        });
-    }
-	else
-	{
-        if(localStorage['promptLoginFailed']!='undefined' && localStorage['promptLoginFailed'] ==  new Date().toDateString())
-        {
-            localStorage['promptLoginFailed'] = 'prompted';
-            console.log('发出提示登录失败信息');
-            sendResponse({result:"false",reson:"需要登录",reson2:"promptLoginFailed"});
-            return;
-        }
-        sendResponse({result:"false",reson:"需要登录"});
+		}
+		else
+		{
+			console.log('今日已经领取过');
+		}
 	}
 }
 
@@ -220,10 +166,56 @@ function monitorLogin(id,sendResponse)
 }
 
 
+//浏览器重启或者插件重新安装的时候初始化数据库
+function initDB(){
+	if(typeof db.savedUser() == 'undefined'){
+		db.setSavedUser('');
+	}
+	if(typeof db.savedUserPwd() == 'undefined'){
+		db.setSavedUserPwd('');
+	}
+	if(typeof db.savedUserNick() == 'undefined'){
+		db.setSavedUserNick('');
+	}
+	if(typeof db.currentUserNick() == 'undefined'){
+		db.setCurrentUserNick('');
+	}
+	if(typeof db.currentUserCoin() == 'undefined'){
+		db.setCurrentUserCoin('');
+	}
+	if(typeof db.prevUserNick() == 'undefined'){
+		db.setPrevUserNick('');
+	}
+	if(typeof db.hasCurrentUserGot() == 'undefined'){
+		db.setHasCurrentUserGot('false');
+	}
+	if(typeof db.hasSavedUserGot() == 'undefined'){
+		db.setHasSavedUserGot('false');
+	}
+	if(typeof db.currentUserGotDate() == 'undefined'){
+		db.setCurrentUserGotDate('');
+	}
+	if(typeof db.savedUserGotDate() == 'undefined'){
+		db.setSavedUserGotDate('');
+	}
+	if(typeof db.dontTryLoginToday() == 'undefined'){
+		db.setDontTryLoginToday('');
+	}
+	if(typeof db.hasTipToShow() == 'undefined'){
+		db.setHasTipToShow('false');
+	}
+	if(typeof db.tipToShowContent() == 'undefined'){
+		db.setTipToShowContent('');
+	}
+	if(typeof db.autoFlushTip() == 'undefined'){
+		db.setAutoFlushTip('true');
+	}
+}
 
 //初始化
 function init()
 {
+	initDB();
 	var newCoin = localStorage['newCoin'];
 	var name =localStorage['tbname'];
 	if( newCoin!= 'undefined' && name != 'undefined')

@@ -1,7 +1,7 @@
 .banner
 {
     background: -webkit-linear-gradient(#FFF2B7, #FAE691 98%, #878787);
-    height: 31px; 
+    height: 50px; 
     width: 100%;
     margin: 0;
     padding: 0;
@@ -11,47 +11,25 @@
     z-index:9999;
 }
 
-.btnOk 
-{ 
-    background: rgb(252,186,73);
-    -webkit-border-radius: 2px;
-    -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-    -webkit-user-select: none;
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, rgb(252,186,73)), color-stop(0.5, rgb(248,160,28)), color-stop(0.9, rgb(253,189,78)));
-    border: 1px solid #F3A835;
-    color: #FFFFFF;
-    font-size: inherit;
-    font-weight: bold;
-    min-width: 7em;
-    padding: 1px 10px 1px 10px;
-    text-decoration: none;
-}
-
-.btnOk:hover, input[type=submit]:hover 
-{ 
-    background: rgb(252,186,73); 
-    -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, rgb(252,192,96)), color-stop(0.5, rgb(247,168,49)), color-stop(0.9, rgb(252,194,93)));
-    border-color: #F39200;
-    color: #FFFFFF;
-    font-weight: bold;
-}
-.btnOk:active, input[type=submit]:active 
-{ 
-	background: rgb(252,186,73); 
-	-webkit-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2); 
-	background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.1, rgb(255,181,61)), color-stop(0.5, rgb(240,143,17)), color-stop(0.9, rgb(245,178,61)));
-    color: #FFFFFF; 
-    font-weight: bold; 
+.iTaoCloseImage
+{
+	width: 32px;
+	
+	height: 32px;
+	margin-top: 8px;
+	margin-left: 8px;
+	cursor:pointer;
 }
 
 .t_center 
 { 
 	margin: 0 auto; 
-    line-height:31px;
     text-align:center;
     float:right;
     width:90%;
+	height: 50px;
+	line-height: 50px;
+	font-size: 15px;
 }
 .t_span
 {
