@@ -27,48 +27,62 @@ var tbLogin = (function(){
 	
 	//是否已经登录到了淘宝
 	function hasAnyoneLogined(){
+		
+		//有任何一个变量没定义则没有登录
+		if(typeof loginedInfoCache.token == 'undefined' || typeof loginedInfoCache.tracknick == 'undefined'
+		|| typeof loginedInfoCache == 'undefined'){
+			return false;
+		}
+	
 		if(loginedInfoCache.token != '' && loginedInfoCache.tracknick != ''){
 			return true;
 		}
+		
 		return false;
 	}
 	
 	//每隔一段时间自动获得登录信息。因为cookie相关的API
 	//都是异步的，与同步方法放在一起时候可能会获取不到值
 	function getLoginedInfoTimer(){
+		//通过一个临时变量
+		var loginedInfoCacheTemp = {};
+		
 		chrome.cookies.getAll({domain:"taobao.com"}, function (cookies){
 			for(var i in cookies){
 				if (cookies[i].name=='_nk_'){
 					if (cookies[i].value!='') 
 					{
-						loginedInfoCache.nk = js_JSONdecode(unescape(cookies[i].value));
+						loginedInfoCacheTemp.nk = js_JSONdecode(unescape(cookies[i].value));
 					}
 					else
 					{
-						loginedInfoCache.nk = '';
+						loginedInfoCacheTemp.nk = '';
 					}
 				}
 				else if (cookies[i].name=='tracknick'){
 					if (cookies[i].value!='') 
 					{
-						loginedInfoCache.tracknick = js_JSONdecode(unescape(cookies[i].value));
+						loginedInfoCacheTemp.tracknick = js_JSONdecode(unescape(cookies[i].value));
 					}
 					else
 					{
-						loginedInfoCache.tracknick = '';
+						loginedInfoCacheTemp.tracknick = '';
 					}
 				}
 				else if (cookies[i].name=='_tb_token_'){
 					if (cookies[i].value!='') 
 					{
-						loginedInfoCache.token=cookies[i].value;
+						loginedInfoCacheTemp.token=cookies[i].value;
 					}
 					else
 					{
-						loginedInfoCache.token = '';
+						loginedInfoCacheTemp.token = '';
 					}
 				}
 			}
+			
+			loginedInfoCache = loginedInfoCacheTemp;
+			loginedInfoCacheTemp = null;
 		});
 	}
 	
