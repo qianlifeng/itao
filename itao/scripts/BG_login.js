@@ -3,9 +3,6 @@ var tbLogin = (function(){
 
     //当前用于登录的tab id
     var currentLoginTabId = '';
-    //用于和前台cs_login进行长链接通信的端口
-    var port = null;
-	
 	var loginedInfoCache = {};
 
     //打开登录tab准备进行登录
@@ -123,6 +120,13 @@ var tbLogin = (function(){
 
        return true;
     }
+	
+	//获得淘金币的详细信息
+	function getTaoJinBiDetail(){
+		if(hasAnyoneLogined()){
+			
+		}
+	}
 
 	
     return {
@@ -155,7 +159,9 @@ var tbLogin = (function(){
 		startGetCookieInfoTimer:function(){
 			setInterval(getLoginedInfoTimer,1000);
 		},
-        port:port
+		getTaoJinBiDetail:function(){	
+			return getTaoJinBiDetail();
+		}
     };
 })();
 

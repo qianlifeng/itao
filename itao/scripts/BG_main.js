@@ -28,7 +28,7 @@ function doGetCoin(){
         if (json.code=='1' || json.code == '2'){
 			//成功获得今日淘金币
 			db.setHasCurrentUserGot('true');
-			db.setCurrentUserCoin(json.newCoin);
+			db.setCurrentUserCoin(json.coinNew);
 			db.setCurrentUserNick(info.tracknick);
 			db.setCurrentUserGotDate(new Date().toDateString());
 			
@@ -72,7 +72,10 @@ function getTaoBaoCoin()
 			doGetCoin();
 		}
 		else{
-			console.log('今日已经领取过');
+			console.log('今日已经领取过...');
+			//虽然在领取的时候会自动设置badge信息，但是有可能插件是被禁止又重新启用
+			//这种情况下就应该设置badge，因为不会在去getCoin了
+			setBadgeText(db.currentUserNick(),db.currentUserCoin(),redColor);
 		}
 	}
 	else{
