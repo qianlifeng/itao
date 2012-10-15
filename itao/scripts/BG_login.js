@@ -92,7 +92,7 @@ var tbLogin = (function(){
 		if(!hasAnyoneLogined()){
 			//登录失败
             console.log('自动登陆失败');
-			showTipToContentScript('loginFailed',true);
+			sendMessageToCurrentTab('loginFailed');
 		}
 		else
 		{
@@ -133,6 +133,12 @@ var tbLogin = (function(){
             }
         },
 		logout:function(){
+
+			db.setHasCurrentUserGot('false');
+			db.setCurrentUserCoin('N/A');
+			db.setCurrentUserNick('');
+			db.setCurrentUserGotDate('');
+			
 			chrome.browserAction.setBadgeText({ text: 'N/A' });
 			chrome.browserAction.setBadgeBackgroundColor({color:'#222'});
 			chrome.browserAction.setTitle({title:'还未登陆'});

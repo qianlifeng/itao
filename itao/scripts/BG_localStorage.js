@@ -16,9 +16,7 @@ var db = (function(){
 		currentUserGotDate:function(){return localStorage['currentUserGotDate']}, //当前登录用户登录淘金币的日期，根据这个判断第二天再次领取 new Date().toDateString()
 		savedUserGotDate:function(){return localStorage['savedUserGotDate']}, //保存用户登录淘金币的日期，根据这个判断第二天再次领取 new Date().toDateString()
 		dontTryLoginToday:function(){return localStorage['dontPromptNeedLoginToday']}, //不再提示今日需要登录 value: new Date().toDateString()
-		hasTipToShow:function(){return localStorage['hasTipToShow']},   //是否有消息需要在前台显示
-		tipToShowContent:function(){return localStorage['tipToShowContent']},   //需要显示的消息
-		autoFlushTip:function(){return localStorage['autoFlushTip']},  //消息被送到前台后，是否需要自动清空消息，否则下次仍然提示消息  true or false
+
 		
 		setSavedUser:function(v){localStorage['savedLoginUser'] = v},   	//保存的登录名
 		setSavedUserPwd:function(v){localStorage['savedLoginPwd']= v},		//保存的用户密码
@@ -31,8 +29,6 @@ var db = (function(){
 		setCurrentUserGotDate:function(v){localStorage['currentUserGotDate']= v}, //当前登录用户登录淘金币的日期，根据这个判断第二天再次领取
 		setSavedUserGotDate:function(v){localStorage['savedUserGotDate']= v}, //保存用户登录淘金币的日期，根据这个判断第二天再次领取
 		setDontTryLoginToday:function(v){localStorage['dontPromptNeedLoginToday']= v}, //不再提示今日需要登录 value: new Date().toDateString()
-		setHasTipToShow:function(v){localStorage['hasTipToShow']= v}, //是否有消息需要在前台显示
-		setTipToShowContent:function(v){localStorage['tipToShowContent']= v}, //需要显示的消息
-		setAutoFlushTip:function(v){localStorage['autoFlushTip']= v} //消息被送到前台后，是否需要自动清空消息，否则下次仍然提示消息  true or false
+	
 	};
 })();

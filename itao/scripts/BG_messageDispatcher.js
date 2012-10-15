@@ -21,23 +21,10 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	console.log("message ==> 得到 "+request.act+" 请求");
     
 	if (request.act == "getCoin"){
-		getTaoBaoCoin(sendResponse);
-	}
-	else if(request.act == "tryLogin"){
-        tbLogin.getInstance().login();
+		getTaoBaoCoin();
 	}
 	else if(request.act == "logout"){
-		tbLogin.getInstance().logout();
-	}
-	else if(request.act == 'hasTipToShow'){
-		if(db.hasTipToShow() == 'true'){
-			//一旦发送给前台显示消息后，清空消息
-			sendResponse({tip:db.tipToShowContent()});
-			
-			if(db.autoFlushTip() == 'true'){
-				stopShowTipToContentScript();
-			}
-		}
+		tbLogin.logout();
 	}
 	else if(request.act == 'dontPromptLoginToday'){
 		stopShowTipToContentScript();

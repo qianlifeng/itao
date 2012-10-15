@@ -20,7 +20,7 @@ function stopTryLoginToday(){
 		r = JSON.parse(response);
 		if(typeof r.act != 'undefined'){
 			if(r.act == 'closeTip'){
-				document.getElementById('banner').style.display ='none';
+				document.getElementById('iTaoBanner').style.display ='none';
 			}
 		}
 	});
