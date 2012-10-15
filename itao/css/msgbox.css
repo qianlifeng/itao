@@ -1,4 +1,4 @@
-.banner
+.iTaoBanner
 {
     background: -webkit-linear-gradient(#FFF2B7, #FAE691 98%, #878787);
     height: 50px; 
@@ -21,7 +21,7 @@
 	cursor:pointer;
 }
 
-.t_center 
+.iTaot_center 
 { 
 	margin: 0 auto; 
     text-align:center;
@@ -31,22 +31,30 @@
 	line-height: 50px;
 	font-size: 15px;
 }
-.t_span
+.iTaot_span
 {
-    line-height:31px;
+    line-height:50px;
+	font-size:15px;
 }
 
-.t_right
+.iTaot_right
 {
     float:right;
     line-height:31px;
     width:10%;
 }
 
-.t_strong 
+.iTaot_strong 
 { 
 	font-weight:bold; 
 	margin-left:5px;
 	margin-right:5px;
 	color: #F50; 
+}
+.iTaoLink,.iTaoLink:visited,.iTaoLink:active
+{
+	color:red;
+	text-decoration:underline;
+	font-weight: normal;
+	font-size:15px;
 }
