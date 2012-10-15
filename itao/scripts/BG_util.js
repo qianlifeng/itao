@@ -8,24 +8,13 @@ function js_JSONdecode(str){
 	return unescape(str.replace(/\\u/g,"%u"));
 }
 
-//有消息需要显示到前台
-function showTipToContentScript(content,dontAutoFlush){
-	db.setHasTipToShow('true');
-	db.setTipToShowContent(content);
-	
-	var dotautoFlash=arguments[1]?arguments[1]:false;
-	if(dotautoFlash){
-		db.setAutoFlushTip('false');
-	}
-	else{
-		db.setAutoFlushTip('true');	
-	}
-}
-
-function stopShowTipToContentScript(){
-	db.setHasTipToShow('false');
-	db.setTipToShowContent('');
-	db.setAutoFlushTip('true');	
+//发送消息到正在浏览的网页
+function sendMessageToCurrentTab(msg){
+	chrome.tabs.query({active:true,currentWindow:true},function(tabs){
+		if(tabs.length > 0){
+			chrome.tabs.sendMessage(tabs[0].id,{act:"showMessage",msg:msg});
+		}
+	});
 }
 
 function ajax(url,callback){
