@@ -4,9 +4,14 @@
   "manifest_version": 2,
   "description": "自动领取淘金币",
   "browser_action": {
-    "default_icon": "icon.png",
+    "default_icon": "img/icon128.png",
     "default_popup": "popup.html"
   },
+  "icons": {
+      "128":"img/icon128.png",
+      "16": "img/icon16.png",
+      "48": "img/icon48.png"
+   },
   "background":{
 	"page":"bg.html"
   },
