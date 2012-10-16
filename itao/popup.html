@@ -1,19 +1,33 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<script type='text/javascript'>
-
-	chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-	  
-	}
-	  
-	</script>
+	<script type="text/javascript" src="scripts/popup.js"></script>
 </head>
 <body>
-	<div style="width:200px;">
-     用户名：xx
+	<div style="width:400px;">
+     用户名：<span id='user'></span>
 	 <br/>
-	 淘金币：xx
+	 淘金币：<span id='coin'></span>
+	 </div>
+	 <div>
+		<table>
+			<thead>
+				<tr>
+					<th>
+						数目
+					</th>
+					<th>
+						行为
+					</th>
+					<th>
+						时间
+					</th>
+				</tr>
+			</thead>
+			<tbody  id="coinDetail">
+				
+			</tbody>
+		</table>
 	 </div>
 </body>
 </html>

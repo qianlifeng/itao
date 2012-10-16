@@ -32,6 +32,12 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	else if(request.act == 'hasMessageFromFrontPage'){
 		msgFromPage(JSON.parse(request.data1),sendResponse);
 	}
+	else if(request.act == 'getTaoJinBiDetail'){
+		getTaoJinBiDetail(sendResponse);
+	}
+	else if(request.act == 'getCurrentUserInfoForPopup'){
+		getCurrentUserInfoForPopup(sendResponse);
+	}
 	
 	//因为使用了异步ajax，所以这里要返回true表明了要等待异步发送给sender
 	return true;

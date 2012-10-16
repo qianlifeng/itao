@@ -120,13 +120,6 @@ var tbLogin = (function(){
 
        return true;
     }
-	
-	//获得淘金币的详细信息
-	function getTaoJinBiDetail(){
-		if(hasAnyoneLogined()){
-			
-		}
-	}
 
 	
     return {
@@ -158,9 +151,6 @@ var tbLogin = (function(){
 		},
 		startGetCookieInfoTimer:function(){
 			setInterval(getLoginedInfoTimer,1000);
-		},
-		getTaoJinBiDetail:function(){	
-			return getTaoJinBiDetail();
 		}
     };
 })();

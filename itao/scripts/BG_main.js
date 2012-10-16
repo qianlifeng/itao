@@ -104,43 +104,34 @@ function getTaoBaoCoin()
 	}
 }
 
-function openTabForLogin()
-{
-	chrome.tabs.create({url:"https://login.taobao.com/member/login.jhtml?ref=itao",active:false});
-}
-
-function isTaoBaoLoginPage(url)
-{
-	if(url.indexOf('https://login.taobao.com') != 0 && url.indexOf('http://login.taobao.com') != 0)
-	{
-		return false;
+//获得淘金币的详细信息
+function getTaoJinBiDetail(sendResponse){
+	if(tbLogin.hasAnyoneLogined()){
+		var info = tbLogin.getLoginedInfo();
+		ajax('http://taojinbi.taobao.com/record/my_coin_detail.htm?tracelog=Tcoin_detail?_tb_token_='+info.token,function(json,text){
+			var reg = new  RegExp(/<td>(.*?)<\/td>\s*?<td>(.*)<\/td>\s*?<td>(.*)<\/td>/gi);
+			var detailArray = [];
+			
+			var s = reg.exec(text);
+			while(s != null){
+				detailArray.push({desc:s[1],date:s[2],coin:s[3]});
+				s = reg.exec(text);
+			}
+			
+			sendResponse({act:'taojinbiDetail',data:detailArray});
+		});
 	}
-	
-	return true;
 }
 
-function monitorLogin(id,sendResponse)
-{
-	console.log("正在监视登录...");
-	chrome.tabs.get(id,function(tab){
-        if(typeof tab == 'undefined')
-        {
-            console.log('因为找不到指定的登录tab，所以监视登录定时器被取消');
-            window.clearInterval(intervalIdForMonitorLogin);
-            return;
-        }
-
-        if(!isTaoBaoLoginPage(tab.url))
-        {
-            //已经登录成功
-            console.log("登录成功...");
-            window.clearInterval(intervalIdForMonitorLogin);
-            chrome.tabs.remove(id);
-        }
-
-	});
-}
-
+//获得当前登录用户概况
+function getCurrentUserInfoForPopup(sendResponse){
+	if(tbLogin.hasAnyoneLogined()){
+		sendResponse({act:'currentUserInfoForPopup',data:{user:db.currentUserNick(),coin:db.currentUserCoin()}});
+	}
+	else{
+		sendResponse({act:'needLoginForPopup'});
+	}
+};
 
 //浏览器重启或者插件重新安装的时候初始化数据库
 function initDB(){
@@ -183,23 +174,6 @@ function initDB(){
 function init()
 {
 	initDB();
-	// var newCoin = db.
-	// var name = db.savedUser();
-	// if( newCoin!= 'undefined' && name != 'undefined')
-	// {
-		// if(hasGetTodaysCoin(name))
-		// {
-			// setBadgeText(name,newCoin,redColor);
-		// }
-		// else
-		// {
-			// setBadgeText(name,newCoin,grayColor);
-		// }
-	// }
-	// else
-	// {
-		// setBadgeText(name,'N/A',grayColor);
-	// }
 }
 
 init();
