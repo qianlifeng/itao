@@ -89,7 +89,7 @@ var tbLogin = (function(){
 		if(!hasAnyoneLogined()){
 			//登录失败
             console.log('自动登陆失败');
-			sendMessageToCurrentTab('loginFailed');
+			sendMessageToCurrentTab({msgType:'loginFailed'});
 		}
 		else
 		{

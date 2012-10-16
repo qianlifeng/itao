@@ -85,11 +85,12 @@ chrome.extension.sendMessage({act: "getCoin"});
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {   
 	if(request.act == "showMessage"){
-		if(request.msg == "loginFailed") {
+		if(request.msg.msgType == "loginFailed") {
 			showLoginFailedTip();  //得到这种提示一般是不能自动登录而且今日还没有领取的情况下
 		}
-		else if(request.msg == "getCoinSucceed") {
-			showtip(1,1);
+		else if(request.msg.msgType == "getCoinSucceed") {
+			var info = request.msg.data;
+			showtip(info.user,info.coin);
 		}
 	}
 	

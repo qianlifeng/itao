@@ -41,7 +41,8 @@ function doGetCoin(){
 			//发送给前台提示领取成功
 			if(json.code == '1') {
 				console.log('成功领取今日淘金币');
-				sendMessageToCurrentTab('getCoinSucceed');
+				var coinGet = json.coinNew - json.coinOld;
+				sendMessageToCurrentTab({msgType:'getCoinSucceed',data:{user:info.tracknick,coin:coinGet}});
 			}
 			else{
 				console.log('今日已经领取');
