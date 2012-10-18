@@ -5,6 +5,7 @@ chrome.extension.sendMessage({act: "getCurrentUserInfoForPopup"},function(respon
 	else if(response.act == 'currentUserInfoForPopup'){
 		document.getElementById('user').innerHTML = response.data.user;
 		document.getElementById('coin').innerHTML = response.data.coin;
+		document.getElementById('loadingImg').style.display = '';
 		document.getElementById('userInfo').style.display = '';
 		tryGetCoinDetail();
 	}

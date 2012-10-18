@@ -14,6 +14,9 @@ function sendMessageToCurrentTab(msg){
 		if(tabs.length > 0){
 			chrome.tabs.sendMessage(tabs[0].id,{act:"showMessage",msg:msg});
 		}
+		else{
+			console.log('没有找到当前打开的tab用于显示信息:'+msg);
+		}
 	});
 }
 

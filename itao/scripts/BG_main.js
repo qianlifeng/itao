@@ -18,6 +18,14 @@ function setBadgeText(name,newCoin,colors)
 	chrome.browserAction.setBadgeBackgroundColor({color:colors});
 }
 
+/**
+ * 从cookie中获取url
+ * @param {Object} cookie
+ */
+function GetUrlFromCookie(cookie){
+    return "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain + cookie.path;
+};
+
 //开始领取淘金币
 function doGetCoin(){
 	
@@ -55,6 +63,13 @@ function doGetCoin(){
 		}
 		else if(!json.code)
 		{
+			chrome.cookies.getAll({domain:"taobao.com"}, function (cookies){
+				for(var i in cookies){
+					if (cookies[i].name=='_tb_token_'){
+						chrome.cookies.remove({url:GetUrlFromCookie(cookies[i]),name:cookies[i].name});
+					}
+				}
+			});
 			console.log('json.code 为空，可能需要登录');
 		}
     });
