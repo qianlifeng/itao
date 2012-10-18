@@ -1,6 +1,6 @@
 ﻿{
   "name": "爱淘",
-  "version": "0.1",
+  "version": "0.11",
   "manifest_version": 2,
   "description": "自动领取淘金币",
   "browser_action": {

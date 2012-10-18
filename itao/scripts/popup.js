@@ -14,7 +14,7 @@ chrome.extension.sendMessage({act: "getCurrentUserInfoForPopup"},function(respon
 function tryGetCoinDetail(){
 	chrome.extension.sendMessage({act: "getTaoJinBiDetail"},function(response){
 		if(response.act == 'taojinbiDetail'){
-			if(response.data != null){
+			if(response.data != null && response.data.length > 0){
 				var coinArray = response.data;
 			
 				var table = document.getElementById("coinDetail");
@@ -26,6 +26,12 @@ function tryGetCoinDetail(){
 				table.innerHTML = htmlStr;
 				document.getElementById('loadingImg').style.display = 'none';
 				document.getElementById('coinDetailTable').style.display = '';
+			}
+			else{
+				document.getElementById('needLogin').style.display = '';
+				document.getElementById('userInfo').style.display = 'none';
+				document.getElementById('loadingImg').style.display = 'none';
+				document.getElementById('coinDetailTable').style.display = 'none';
 			}
 		}
 	});

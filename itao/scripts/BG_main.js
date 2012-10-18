@@ -79,6 +79,13 @@ function doGetCoin(){
 function getTaoBaoCoin()
 {
 	if(tbLogin.hasAnyoneLogined()){
+		//判断当前登录用户是否和数据库里面的currentUser一样
+		//如果不一样说明用户通过某种渠道更换了登录用户
+		if(db.currentUserNick() !='' && tbLogin.getLoginedInfo().tracknick != db.currentUserNick()){
+			tbLogin.logout();
+			return;
+		}
+	
 		if(db.hasCurrentUserGot() == 'false'){
 			doGetCoin();
 		}
